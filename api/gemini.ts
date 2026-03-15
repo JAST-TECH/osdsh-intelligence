@@ -1,22 +1,23 @@
 // api/gemini.ts
-export const config = {
-  runtime: 'edge', // 超高速に動作するEdge環境を使用します
-};
 
-export default async function handler(req: Request) {
+// ▼ Vercelの無料枠の最大待機時間（60秒）まで延長する設定
+export const maxDuration = 60; 
+
+export default async function handler(req: any, res: any) {
   // POST以外のリクエストは弾く
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method Not Allowed' }), { status: 405 });
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
   try {
-    const { systemPrompt, userPrompt, model = 'gemini-2.5-flash', isJson = false } = await req.json();
+    // サーバーレス環境では req.body にすでにデータが入っています
+    const { systemPrompt, userPrompt, model = 'gemini-2.5-flash', isJson = false } = req.body;
     
-    // ▼ ここでVercelに設定した環境変数を読み込みます！ ▼
+    // Vercelに設定した環境変数を読み込む
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      return new Response(JSON.stringify({ error: 'API key is missing in server environment' }), { status: 500 });
+      return res.status(500).json({ error: 'API key is missing in server environment' });
     }
 
     // Geminiへ送る準備
@@ -31,21 +32,19 @@ export default async function handler(req: Request) {
       }
     };
 
-    // VercelサーバーからGeminiへ通信
+    // Geminiへ通信
     const geminiRes = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
 
-    // 結果をブラウザに返す
     const data = await geminiRes.json();
-    return new Response(JSON.stringify(data), {
-      status: geminiRes.status,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    
+    // 結果をフロントエンド（ブラウザ）に返す
+    return res.status(geminiRes.status).json(data);
 
   } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+    return res.status(500).json({ error: error.message });
   }
 }
