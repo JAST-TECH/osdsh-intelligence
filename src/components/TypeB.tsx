@@ -83,16 +83,17 @@ const renderMarkdownText = (text: string | undefined, keyPrefix = "txt"): React.
 /**
  * 3. API Communication with Exponential Backoff
  */
+// src/components/TypeA.tsx, TypeB.tsx, TypeC.tsx 内の関数を上書き
+
 const callGeminiApi = async (apiKey: string, systemPrompt: string, userPrompt: string, isJson = false): Promise<any> => {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`;
+  // 通信先を自分の中継API（Vercelサーバー）に変更
+  const url = '/api/gemini';
+  
   const payload = {
-    contents: [{ parts: [{ text: userPrompt }] }],
-    systemInstruction: { parts: [{ text: systemPrompt }] },
-    generationConfig: { 
-      temperature: 0.1, 
-      maxOutputTokens: 8192,
-      responseMimeType: isJson ? "application/json" : "text/plain"
-    }
+    systemPrompt,
+    userPrompt,
+    model: MODEL_NAME,
+    isJson
   };
 
   const maxRetries = 5;

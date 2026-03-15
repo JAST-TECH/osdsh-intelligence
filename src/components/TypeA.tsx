@@ -38,14 +38,19 @@ interface Message {
 /**
  * API Communication Helper
  */
-const callGeminiApi = async (apiKey: string, systemPrompt: string, userPrompt: string): Promise<string> => {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`;
-  const payload = {
-    contents: [{ parts: [{ text: userPrompt }] }],
-    systemInstruction: { parts: [{ text: systemPrompt }] },
-    generationConfig: { temperature: 0.2, maxOutputTokens: 8192 }
-  };
+// src/components/TypeA.tsx, TypeB.tsx, TypeC.tsx 内の関数を上書き
+
+const callGeminiApi = async (apiKey: string, systemPrompt: string, userPrompt: string, isJson = false): Promise<any> => {
+  // 通信先を自分の中継API（Vercelサーバー）に変更
+  const url = '/api/gemini';
   
+  const payload = {
+    systemPrompt,
+    userPrompt,
+    model: MODEL_NAME,
+    isJson
+  };
+
   const maxRetries = 5;
   const backoffDelays = [1000, 2000, 4000, 8000, 16000];
 
@@ -56,22 +61,21 @@ const callGeminiApi = async (apiKey: string, systemPrompt: string, userPrompt: s
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-
+      
       if (!response.ok) {
         if (response.status === 429) await new Promise(r => setTimeout(r, 3000));
-        throw new Error(`HTTP Error: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const data = await response.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
       
-      if (!text) throw new Error("Empty API response");
-      return text;
-    } catch (error: any) {
+      const data = await response.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+      
+      return isJson ? JSON.parse(text) : text;
+    } catch (error) {
       if (i === maxRetries - 1) throw error;
       await new Promise(r => setTimeout(r, backoffDelays[i]));
     }
   }
-  return "";
 };
 
 /**
