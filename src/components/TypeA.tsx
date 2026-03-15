@@ -30,7 +30,7 @@ import {
 /**
  * Global Constants & Types
  */
-const MODEL_NAME = "gemini-2.5-flash";
+// const MODEL_NAME = "gemini-2.5-flash";
 const SYSTEM_VERSION = "v12.5.21-A-stable";
 
 interface ReportData {

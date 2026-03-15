@@ -22,7 +22,7 @@ import {
  * 1. CONFIG & CONSTANTS & TYPES
  * =============================================================================
  */
-const MODEL_NAME = "gemini-2.5-flash";
+// const MODEL_NAME = "gemini-2.5-flash";
 const SYSTEM_VERSION = "v1.6.9-Unified-Gold";
 
 const PUBLISHER = "沖縄主権防衛戦略本部";
