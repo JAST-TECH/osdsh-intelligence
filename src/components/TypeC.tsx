@@ -19,10 +19,6 @@ const PUBLISHER = "沖縄主権防衛戦略本部";
 const DEVELOPER = "一般社団法人日本沖縄政策研究フォーラム";
 const ENG_NAME = "Okinawa Sovereignty Defense Strategic Headquarters";
 
-interface TypeCProps {
-  apiKey: string;
-}
-
 interface ReportData {
   summary: string;
   narrativeDeconstruction: string;
@@ -93,7 +89,7 @@ const parseSessionName = (text: string, fallbackDate: string): string => {
 
 // src/components/TypeA.tsx, TypeB.tsx, TypeC.tsx 内の関数を上書き
 
-const callGeminiApi = async (apiKey: string, systemPrompt: string, userPrompt: string, isJson = false): Promise<any> => {
+const callGeminiApi = async (systemPrompt: string, userPrompt: string, isJson = false): Promise<any> => {
   // 通信先を自分の中継API（Vercelサーバー）に変更
   const url = '/api/gemini';
   
@@ -256,7 +252,7 @@ const DateDisplay: React.FC<{
  * 4. MAIN APPLICATION COMPONENT
  * =============================================================================
  */
-const TypeC: React.FC<TypeCProps> = ({ apiKey }) => {
+const TypeC: React.FC = () => {
   const [inputs, setInputs] = useState<InputState>({ typeA: '', typeB: '', fileA: '', fileB: '' });
   const [dates, setDates] = useState<DateState>({ dateA: '', dateB: '' });
   const [editStates, setEditStates] = useState<EditState>({ editA: false, editB: false });
@@ -413,10 +409,10 @@ const TypeC: React.FC<TypeCProps> = ({ apiKey }) => {
     try {
       const combined = `【A:戦略データ】\n${inputs.typeA}\n\n【B:各論データ】\n${inputs.typeB}`;
       setProgress(40);
-      const res = await callGeminiApi(apiKey, systemPrompt, combined);
+      const res = await callGeminiApi(systemPrompt, combined);
       setProgress(90);
       
-      const sections = res.split(/\[SECTION_SEPARATOR\]/g).map(s => s.trim());
+      const sections = res.split(/\[SECTION_SEPARATOR\]/g).map((s: any) => s.trim());
       setReport({
         summary: sections[0] || "",
         narrativeDeconstruction: sections[1] || "",

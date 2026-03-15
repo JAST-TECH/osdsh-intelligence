@@ -55,9 +55,9 @@ const App: React.FC = () => {
           </div>
         ) : (
           <>
-            {activeTab === 'A' && <TypeA apiKey={apiKey} />}
-            {activeTab === 'B' && <TypeB apiKey={apiKey} />}
-            {activeTab === 'C' && <TypeC apiKey={apiKey} />}
+            {activeTab === 'A' && <TypeA />}
+            {activeTab === 'B' && <TypeB />}
+            {activeTab === 'C' && <TypeC />}
           </>
         )}
 

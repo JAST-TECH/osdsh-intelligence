@@ -12,10 +12,6 @@ import {
 const MODEL_NAME = 'gemini-2.5-flash';
 const SYSTEM_VERSION = 'v12.5.49-B-Skeleton-Drive-Fixed';
 
-interface TypeBProps {
-  apiKey: string;
-}
-
 interface Message {
   role: 'user' | 'bot';
   text: string;
@@ -85,7 +81,7 @@ const renderMarkdownText = (text: string | undefined, keyPrefix = "txt"): React.
  */
 // src/components/TypeA.tsx, TypeB.tsx, TypeC.tsx 内の関数を上書き
 
-const callGeminiApi = async (apiKey: string, systemPrompt: string, userPrompt: string, isJson = false): Promise<any> => {
+const callGeminiApi = async (systemPrompt: string, userPrompt: string, isJson = false): Promise<any> => {
   // 通信先を自分の中継API（Vercelサーバー）に変更
   const url = '/api/gemini';
   
@@ -126,7 +122,7 @@ const callGeminiApi = async (apiKey: string, systemPrompt: string, userPrompt: s
 /**
  * 4. Follow-up Chat Component
  */
-const FollowUpChat: React.FC<{ apiKey: string }> = ({ apiKey }) => {
+const FollowUpChat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -145,7 +141,7 @@ const FollowUpChat: React.FC<{ apiKey: string }> = ({ apiKey }) => {
     setLoading(true);
     
     try {
-      const aiText = await callGeminiApi(apiKey, "日本語で論理的に回答せよ。OSDSHの立場から回答せよ。", input, false);
+      const aiText = await callGeminiApi("日本語で論理的に回答せよ。OSDSHの立場から回答せよ。", input, false);
       setMessages(prev => [...prev, { role: 'bot', text: aiText, id: crypto.randomUUID() }]);
     } catch (err: any) {
       setMessages(prev => [...prev, { role: 'bot', text: err.message, id: crypto.randomUUID() }]);
@@ -314,7 +310,7 @@ const AnalysisProgressBar: React.FC<{ progress: number; status: string }> = ({ p
 /**
  * 7. Main Application Component (Type B)
  */
-const TypeB: React.FC<TypeBProps> = ({ apiKey }) => {
+const TypeB: React.FC = () => {
   const [val, setVal] = useState('');
   const [loading, setLoading] = useState(false);
   const [showReport, setShowReport] = useState(false); 
@@ -350,7 +346,7 @@ const TypeB: React.FC<TypeBProps> = ({ apiKey }) => {
       // Step 1: 情報名の特定
       const metaPrompt = `あなたはOSDSH主席アナリスト。入力テキストから「翻訳分析対象の情報名（例：2026年1月17日中国外交部記者会見）」を特定し、その名称のみを出力せよ。
 【最重要命令】中国語表現は一切使用せず、正しい日本語公用文に翻訳せよ。例：「林剑主持例行记者会」→「林剣報道官定例記者会見」。「外交部发言人」→「外交部報道官」。`;
-      const name = await callGeminiApi(apiKey, metaPrompt, val, false);
+      const name = await callGeminiApi(metaPrompt, val, false);
       setInfoName(name);
       setProgress(15);
 
@@ -359,7 +355,7 @@ const TypeB: React.FC<TypeBProps> = ({ apiKey }) => {
       const structPrompt = `入力テキストから質疑応答の全項目を抽出し、以下のJSON配列形式で出力せよ。
 [{"id": "Q1", "cn": "原文..."}, {"id": "A1-1", "cn": "原文..."}, ...]
 【ID規則】質問は Q1, Q2...。回答は A1-1, A1-2...。冒頭発言（P等）は除外せよ。`;
-      const structure: TableRow[] = await callGeminiApi(apiKey, structPrompt, val, true);
+      const structure: TableRow[] = await callGeminiApi(structPrompt, val, true);
       setTableRows(structure);
       setProgress(30);
 
@@ -383,7 +379,7 @@ const TypeB: React.FC<TypeBProps> = ({ apiKey }) => {
 入力データ：
 ${JSON.stringify(batch)}`;
 
-        const results: TableRow[] = await callGeminiApi(apiKey, fillPrompt, `全項目の解析をJSON配列 [{"id":"...", "jp":"...", "impact":"..."}] で返せ。`, true);
+        const results: TableRow[] = await callGeminiApi(fillPrompt, `全項目の解析をJSON配列 [{"id":"...", "jp":"...", "impact":"..."}] で返せ。`, true);
         
         setTableRows(prev => {
           const newRows = [...prev];
@@ -596,7 +592,7 @@ ${tableMarkdown}
               </div>
              )}
             
-            <FollowUpChat apiKey={apiKey} />
+            <FollowUpChat />
           </div>
         )}
       </div>

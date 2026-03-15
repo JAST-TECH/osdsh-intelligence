@@ -14,10 +14,6 @@ import {
 const MODEL_NAME = 'gemini-2.5-flash';
 const SYSTEM_VERSION = 'v12.5.21-A-stable';
 
-interface TypeAProps {
-  apiKey: string;
-}
-
 interface ReportData {
   summaryHeader: string;
   summary: string;
@@ -40,7 +36,7 @@ interface Message {
  */
 // src/components/TypeA.tsx, TypeB.tsx, TypeC.tsx 内の関数を上書き
 
-const callGeminiApi = async (apiKey: string, systemPrompt: string, userPrompt: string, isJson = false): Promise<any> => {
+const callGeminiApi = async (systemPrompt: string, userPrompt: string, isJson = false): Promise<any> => {
   // 通信先を自分の中継API（Vercelサーバー）に変更
   const url = '/api/gemini';
   
@@ -194,7 +190,7 @@ const renderMarkdownText = (text: string, forceWhite = false, topLevelKey = "roo
 /**
  * 3. Follow-up Chat Component
  */
-const FollowUpChat: React.FC<{ apiKey: string }> = ({ apiKey }) => {
+const FollowUpChat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -213,7 +209,7 @@ const FollowUpChat: React.FC<{ apiKey: string }> = ({ apiKey }) => {
     setLoading(true);
 
     try {
-      const aiText = await callGeminiApi(apiKey, "日本語で論理的に回答せよ。OSDSHの立場から回答せよ。", input);
+      const aiText = await callGeminiApi("日本語で論理的に回答せよ。OSDSHの立場から回答せよ。", input);
       setMessages(prev => [...prev, { role: 'bot', text: aiText, id: crypto.randomUUID() }]);
     } catch (err: any) {
       setMessages(prev => [...prev, { role: 'bot', text: err.message || 'Error occurred', id: crypto.randomUUID() }]);
@@ -357,7 +353,7 @@ const AnalysisProgressBar: React.FC<{ progress: number; status: string }> = ({ p
 /**
  * 6. Main Application Component (Type A)
  */
-const TypeA: React.FC<TypeAProps> = ({ apiKey }) => {
+const TypeA: React.FC = () => {
   const [val, setVal] = useState('');
   const [loading, setLoading] = useState(false);
   const [showReport, setShowReport] = useState(false); 
@@ -399,11 +395,11 @@ const TypeA: React.FC<TypeAProps> = ({ apiKey }) => {
 
     try {
       setStatusMsg('中国の「三戦」工作ロジックを解体中...');
-      const resultText = await callGeminiApi(apiKey, masterSystemPrompt, val);
+      const resultText = await callGeminiApi(masterSystemPrompt, val);
       setProgress(100);
       setStatusMsg('解析完了。戦略レポートを生成しました。');
 
-      const sections = resultText.split(/\[SECTION_SEPARATOR\]/g).map(s => s.trim());
+      const sections = resultText.split(/\[SECTION_SEPARATOR\]/g).map((s: any) => s.trim());
       
       setReport({
         summaryHeader: sections[0] || "解析失敗",
@@ -643,7 +639,7 @@ const TypeA: React.FC<TypeAProps> = ({ apiKey }) => {
                )}
             </div>
 
-            <FollowUpChat apiKey={apiKey} />
+            <FollowUpChat />
           </div>
         )}
       </div>
