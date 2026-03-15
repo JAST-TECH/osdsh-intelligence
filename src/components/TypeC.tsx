@@ -1,7 +1,7 @@
 // src/components/TypeC.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
-  Download, Target, Zap, XCircle, Calendar, 
+  Download, Zap, XCircle, Calendar, 
   FileSearch, Edit3, Fingerprint, ArrowLeft,
   ShieldAlert, BrainCircuit, Network, Info as InfoIcon,
   Code, Check

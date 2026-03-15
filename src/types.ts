@@ -1,6 +1,4 @@
 // src/types.ts
-import { ReactNode } from 'react';
-
 export interface AppLogoProps {
   size?: number;
   className?: string;

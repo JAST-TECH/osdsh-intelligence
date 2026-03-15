@@ -190,7 +190,7 @@ const renderMarkdownText = (text: string, forceWhite = false, topLevelKey = "roo
 /**
  * 3. Follow-up Chat Component
  */
-const FollowUpChat: React.FC<{ dt: string; apiKey: string }> = ({ dt, apiKey }) => {
+const FollowUpChat: React.FC<{ apiKey: string }> = ({ apiKey }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -639,7 +639,7 @@ const TypeA: React.FC<TypeAProps> = ({ apiKey }) => {
                )}
             </div>
 
-            <FollowUpChat dt={dt} apiKey={apiKey} />
+            <FollowUpChat apiKey={apiKey} />
           </div>
         )}
       </div>
