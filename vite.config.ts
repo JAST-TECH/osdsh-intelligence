@@ -7,5 +7,5 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  base: '/osdsh-intelligence/',
+  // base: '/osdsh-intelligence/',
 })
